@@ -1,0 +1,69 @@
+spring:
+    shardingsphere:
+        datasource: # 配置数据源
+            common:
+                type: com.zaxxer.hikari.HikariDataSource
+                driver-class-name: com.mysql.jdbc.Driver
+                username: dwj
+                password: DWJ2128033qaz!
+                max-active: 16
+            names: ds0, ds1
+            ds0: # 虚拟数据源名称
+                jdbc-url: jdbc:mysql://188.131.247.10:3306/shardingsphere_test1?serverTimezone=UTC&useSSL=false&useUnicode=true&characterEncoding=UTF-8
+                type: com.zaxxer.hikari.HikariDataSource
+                driver-class-name: com.mysql.jdbc.Driver
+                username: dwj
+                password: DWJ2128033qaz!
+                max-active: 16
+            ds1:
+                jdbc-url: jdbc:mysql://188.131.247.10:3306/shardingsphere_test2?serverTimezone=UTC&useSSL=false&useUnicode=true&characterEncoding=UTF-8
+                type: com.zaxxer.hikari.HikariDataSource
+                driver-class-name: com.mysql.jdbc.Driver
+                username: dwj
+                password: DWJ2128033qaz!
+                max-active: 16
+        rules: # 配置数据表规则
+            sharding:
+                default-database-strategy: # 配置分库策略
+                    standard:
+                        sharding-column: user_id
+                        sharding-algorithm-name: database-inline
+                binding-tables: t_order,t_order_item
+                broadcast-tables: t_address
+                tables:
+                    t_order:
+                        actual-data-nodes: ds$->{0..1}.t_order_$->{0..1} # spring 只能用 $->{} 的表达形式，${} 这样的表达形式是表示绑定变量
+                        table-strategy:
+                            standard:
+                                sharding-column: order_id
+                                sharding-algorithm-name: t-order-item-inline
+                        key-generate-strategy:
+                            column: order_id
+                            key-generate-name: snowflake
+                    t_order_item:
+                        actual-data-nodes: ds$->{0..1}.t_order_item_$->{0..1}
+                        table-strategy:
+                            standard:
+                                sharding-column: order_id
+                                sharding-algorithm-name: t-order-item-inline
+                        key-generate-strategy:
+                            column: order_item_id
+                            key-generate-name: snowflake
+                sharding-algorithms: # 配置分片策略
+                    database-inline:
+                        type: INLINE
+                        props:
+                            algorithm-expression: ds$->{user_id % 2}
+                    t-order-inline:
+                        type: INLINE
+                        props:
+                            algorithm-expression: t_order_$->{order_id % 2}
+                    t-order-item-inline:
+                        type: INLINE
+                        props:
+                            algorithm-expression: t_order_item_$->{order_id % 2}
+                key-generators:
+                    snowflake:
+                        type: SNOWFLAKE
+                        props:
+                            worker-id: 123

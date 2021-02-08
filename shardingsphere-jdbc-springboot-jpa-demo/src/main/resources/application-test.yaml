@@ -1,0 +1,14 @@
+spring:
+    jpa:
+        properties:
+            hibernate:
+                hbm2ddl:
+                    auto: create-drop
+                dialect: org.hibernate.dialect.MySQL5Dialect
+                show_sql: true
+    profiles:
+#        active: sharding-databases
+#        active: sharding-tables
+        active: sharding-databases-tables
+#        active: replica-query
+#        active: sharding-replica-query

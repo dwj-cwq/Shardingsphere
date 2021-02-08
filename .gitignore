@@ -1,0 +1,23 @@
+.DS_Store
+package-lock.json
+node_modules/
+BUILD.txt
+target/
+log/
+*.flattened-pom.xml
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+/test/
+/log.file_IS_UNDEFINED
